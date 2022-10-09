@@ -33,7 +33,7 @@ export default {
       })
 
       if (!valid) {
-        throw new UserInputError('Error', { errors })
+        throw new UserInputError('Bad input', { errors })
       }
 
       const usernameAlreadyTaken = await User.findOne({ username })
@@ -79,7 +79,7 @@ export default {
       const { errors, valid } = validateLoginInput({ email, password })
 
       if (!valid) {
-        throw new UserInputError('Error', { errors })
+        throw new UserInputError('Bad input', { errors })
       }
 
       const user = await User.findOne({ email })
