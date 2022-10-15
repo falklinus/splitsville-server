@@ -1,6 +1,7 @@
 import { model, Schema } from 'mongoose'
 
 const expenseSchema = new Schema({
+  groupId: { type: Schema.Types.ObjectId, ref: 'groups' },
   title: String,
   amount: Number,
   createdAt: String,

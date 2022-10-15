@@ -1,5 +1,5 @@
 import { AuthenticationError, UserInputError } from 'apollo-server'
-import { Expense, User } from '../../models/index.js'
+import { Expense, Group } from '../../models/index.js'
 import checkAuth from '../../util/checkAuth.js'
 
 export default {
@@ -23,14 +23,29 @@ export default {
         throw new Error('Post not found')
       }
     },
+    group_getExpenses: async (_, { groupId }) => {
+      try {
+        const expenses = Expense.find({ groupId })
+        return expenses
+      } catch (error) {
+        throw new Error(error)
+      }
+    },
   },
   Mutation: {
-    createExpense: async (
+    group_createExpense: async (
       _,
-      { createExpenseInput: { title, amount, paidBy, shares } },
+      { groupId, createExpenseInput: { title, amount, paidBy, shares } },
       context
     ) => {
       const user = checkAuth(context)
+      const group = await Group.findById(groupId)
+
+      if (!group) {
+        throw new UserInputError('Error', {
+          error: `Could not find group with id ${groupId}`,
+        })
+      }
 
       const error = {}
 
@@ -47,6 +62,7 @@ export default {
       }
 
       const newExpense = new Expense({
+        groupId,
         title: title ?? '',
         amount,
         createdAt: new Date().toISOString(),
@@ -55,19 +71,31 @@ export default {
         shares,
       })
       const expense = await newExpense.save()
-      return expense
+
+      group.expenses.push(expense.id)
+      await group.save()
+
+      return group
     },
     deleteExpense: async (_, { expenseId }, context) => {
       const user = checkAuth(context)
 
       try {
         const expense = await Expense.findById(expenseId)
-        if (expense.createdBy.toString() === user.id) {
-          await expense.delete()
-          return 'Expense deleted successfully '
-        } else {
+
+        if (!expense.createdBy.toString() === user.id) {
           throw new AuthenticationError('Action not allowed')
         }
+
+        const group = await Group.findByIdAndUpdate(expense.groupId, {
+          $pullAll: {
+            expenses: [expenseId],
+          },
+        })
+
+        await expense.delete()
+
+        return group
       } catch (err) {
         throw new Error(err)
       }
