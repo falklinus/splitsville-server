@@ -13,6 +13,15 @@ export default {
         throw new Error(error)
       }
     },
+    getGroup: async (_, { groupId }, context) => {
+      checkAuth(context)
+      try {
+        const group = await Group.findById(groupId)
+        return group
+      } catch (error) {
+        throw new Error(error)
+      }
+    },
   },
   Mutation: {
     createGroup: async (_, { userIds, title }, context) => {

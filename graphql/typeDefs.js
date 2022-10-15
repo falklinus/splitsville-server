@@ -66,6 +66,7 @@ export default gql`
     getExpense(expenseId: ID!): Expense
     group_getExpenses(groupId: ID!): [Expense]
     getGroups: [Group]
+    getGroup(groupId: ID!): Group
   }
 
   type Mutation {
