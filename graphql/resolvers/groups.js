@@ -33,7 +33,7 @@ export default {
         .join(' + ')} = Sant`
 
       const newGroup = new Group({
-        title: title || fallBackTitle,
+        title: title && title.trim() !== '' ? title : fallBackTitle,
         members: groupUserIds,
         createdAt: new Date().toISOString(),
         createdBy: user.id,
