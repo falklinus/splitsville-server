@@ -4,7 +4,8 @@ import checkAuth from '../../util/checkAuth.js'
 
 export default {
   Query: {
-    getExpenses: async () => {
+    getExpenses: async (_, __, context) => {
+      checkAuth(context)
       try {
         const expenses = Expense.find()
         return expenses
@@ -12,7 +13,8 @@ export default {
         throw new Error(error)
       }
     },
-    getExpense: async (_, { expenseId }) => {
+    getExpense: async (_, { expenseId }, context) => {
+      checkAuth(context)
       try {
         const expense = await Expense.findById(expenseId)
         if (!expense) {
