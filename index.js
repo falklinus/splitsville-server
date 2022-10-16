@@ -4,7 +4,6 @@ import {connect} from 'mongoose'
 import {MONGODB} from './config.js'
 import typeDefs from './graphql/typeDefs.js'
 import resolvers from './graphql/resolvers/index.js'
-import cors from 'cors'
 
 const server = new ApolloServer({
     typeDefs,
