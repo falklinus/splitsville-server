@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { User } from '../../models/index.js'
-import { SECRET_KEY } from '../../config.js'
+import { JWT_SECRET_KEY } from '../../config.js'
 import { UserInputError } from 'apollo-server'
 import {
   validateLoginInput,
@@ -15,7 +15,7 @@ const generateToken = (user) =>
       email: user.email,
       username: user.username,
     },
-    SECRET_KEY
+    JWT_SECRET_KEY
   )
 
 export default {

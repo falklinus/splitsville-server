@@ -1,6 +1,6 @@
 import { AuthenticationError } from 'apollo-server'
 import jwt from 'jsonwebtoken'
-import { SECRET_KEY } from '../config.js'
+import { JWT_SECRET_KEY } from '../config.js'
 
 export default (context) => {
   const authHeader = context.req.headers.authorization
@@ -16,7 +16,7 @@ export default (context) => {
   }
 
   try {
-    const user = jwt.verify(token, SECRET_KEY)
+    const user = jwt.verify(token, JWT_SECRET_KEY)
     return user
   } catch (err) {
     throw new AuthenticationError('Invalid/Expired token')
