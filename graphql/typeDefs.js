@@ -10,6 +10,7 @@ export default gql`
     email: String
     createdAt: String
     token: String
+    friends: [User!]!
   }
 
   type ExpenseShare {
@@ -62,6 +63,7 @@ export default gql`
   }
 
   type Query {
+    getMe: User
     getExpenses: [Expense]
     getExpense(expenseId: ID!): Expense
     group_getExpenses(groupId: ID!): [Expense]
@@ -72,6 +74,7 @@ export default gql`
   type Mutation {
     register(registerInput: RegisterInput!): User!
     login(loginInput: LoginInput!): User!
+    addFriend(email: String!): User
     createGroup(userIds: [ID!]!, title: String): Group!
     group_createExpense(
       groupId: ID!

@@ -4,9 +4,11 @@ import { User } from '../../models/index.js'
 import { JWT_SECRET_KEY } from '../../config.js'
 import { UserInputError } from 'apollo-server'
 import {
+  validateEmail,
   validateLoginInput,
   validateRegisterInput,
 } from '../../util/validators.js'
+import checkAuth from '../../util/checkAuth.js'
 
 const generateToken = (user) =>
   jwt.sign(
@@ -19,6 +21,13 @@ const generateToken = (user) =>
   )
 
 export default {
+  Query: {
+    getMe: async (_, __, context) => {
+      const user = checkAuth(context)
+      const me = await User.findById(user.id)
+      return me
+    },
+  },
   Mutation: {
     register: async (
       _,
@@ -108,6 +117,30 @@ export default {
         id: user.id,
         token,
       }
+    },
+
+    addFriend: async (_, { email }, context) => {
+      const { errors, valid } = validateEmail(email)
+
+      if (!valid) {
+        throw new UserInputError('Bad input', { errors })
+      }
+
+      const newFriend = await User.findOne({ email })
+      if (!newFriend) {
+        throw new Error('Error', `Could not find user with email ${email}`)
+      }
+
+      const contextUser = checkAuth(context)
+
+      const dbUser = await User.findById(contextUser.id)
+      dbUser.friends.push(newFriend._id.toString())
+      dbUser.save()
+
+      newFriend.friends.push(contextUser.id)
+      newFriend.save()
+
+      return dbUser
     },
   },
 }

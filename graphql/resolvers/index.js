@@ -25,7 +25,14 @@ export default {
       }),
     createdBy: async (parent) => await User.findById(parent.createdBy),
   },
+  User: {
+    friends: async (parent) =>
+      await User.find({
+        _id: { $in: parent.friends },
+      }),
+  },
   Query: {
+    ...userResolver.Query,
     ...expenseResolver.Query,
     ...groupResolver.Query,
   },
