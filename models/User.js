@@ -11,6 +11,20 @@ const userSchema = new Schema({
       ref: 'users',
     },
   ],
+}, {
+  statics: {
+    searchFields(searchTerm) {
+      const stringSearchFields = ['email', 'username'];
+      const query = {
+        $or: [
+          ...stringSearchFields.map(field => ({
+            [field]: new RegExp('^' + searchTerm, 'i')
+          })),
+        ]
+      };
+      return this.find(query);
+    }
+  },
 })
 
 export default model('User', userSchema)

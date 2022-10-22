@@ -27,6 +27,10 @@ export default {
       const me = await User.findById(user.id)
       return me
     },
+    searchUsers: async(_, {searchTerm}, context) => {
+      checkAuth(context)
+        return User.searchFields(searchTerm)
+    }
   },
   Mutation: {
     register: async (

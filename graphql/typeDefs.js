@@ -64,6 +64,7 @@ export default gql`
 
   type Query {
     getMe: User
+    searchUsers(searchTerm: String): [User]
     getExpenses: [Expense]
     getExpense(expenseId: ID!): Expense
     group_getExpenses(groupId: ID!): [Expense]
