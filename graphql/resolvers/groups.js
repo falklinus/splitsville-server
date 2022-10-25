@@ -1,3 +1,4 @@
+import { UserInputError } from 'apollo-server'
 import Group from '../../models/Group.js'
 import User from '../../models/User.js'
 import checkAuth from '../../util/checkAuth.js'
@@ -29,12 +30,16 @@ export default {
 
       const groupUserIds = [...userIds, user.id]
 
+      if (groupUserIds.length < 2) {
+        throw new UserInputError('A group needs to have at least two members')
+      }
+
       const usersInGroup = await User.find({
         _id: { $in: groupUserIds },
       })
 
       if (!usersInGroup.length == groupUserIds.length) {
-        throw new UserInputError('Error', { error: 'Could not find all users' })
+        throw new UserInputError('Could not find all users')
       }
 
       const fallBackTitle = `${usersInGroup
@@ -46,6 +51,19 @@ export default {
         members: groupUserIds,
         createdAt: new Date().toISOString(),
         createdBy: user.id,
+      })
+
+      usersInGroup.forEach((user_a) => {
+        usersInGroup.forEach(async (user_b) => {
+          if (user_a.id != user_b.id) {
+            if (!user_a.friends.includes(user_b.id)) {
+              user_a.friends.push(user_b.id)
+              user_b.friends.push(user_a.id)
+              await user_a.save()
+              await user_b.save()
+            }
+          }
+        })
       })
 
       const group = await newGroup.save()
